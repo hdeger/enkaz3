@@ -120,33 +120,37 @@
         
         const kart={
             enkaz:[
-                {m:'Çocuk kurtarılabilir!',e:1,k:1,item:'hilti'},
-                {m:'2 kişi sıkışmış durumda',e:-1,k:2,item:'hilti'},
-                {m:'3 kişi kurtarılabilir!',e:0,k:3,item:'hilti'},
-                {m:'Enkaz tehlikeli görünüyor',e:-2,k:0},
-                {m:'Aile kurtarılabilir',e:1,k:2,item:'hilti'},
-                {m:'Item buldunuz!',item_bul:'hilti'}
+                {m:'Yaşlı bir kadın enkazın altından bağırıyor. "Torunum da burada!" diyor gözyaşlarıyla.',secim:true,s1:{m:'Kurtarmaya çalış',e:0,k:2,item:'hilti'},s2:{m:'İlerle, riskli',e:1,k:0}},
+                {m:'Genç bir baba kolundan yaralı. "Lütfen, karım ve kızım üst katta!" diye yalvarıyor.',e:-1,k:2,item:'hilti'},
+                {m:'Çocuk sesleri geliyor enkazdan. 3 kardeş olabilir. Ama yapı her an çökebilir.',secim:true,s1:{m:'Riski göze al',e:-2,k:3,item:'hilti'},s2:{m:'Güvenliğe çekil',e:0,k:0}},
+                {m:'Yıkık binanın yanında bir alet deposu var. İçeri girersen ekibini riske atacaksın.',secim:true,s1:{m:'Araç gir, hilti ara',item_bul:'hilti',e:-1},s2:{m:'Devam et',e:0,k:0}},
+                {m:'Apartmandan 2 kişiyi çıkardınız ama içerde daha var. Ekibiniz yorgun, devam etmek tehlikeli.',secim:true,s1:{m:'Devam et kurtarmaya',e:-1,k:2,item:'hilti'},s2:{m:'Ekibi koru, çekil',e:1,k:0}},
+                {m:'Enkaz altında bir telefon çalıyor, durmadan... Birisi cevap bekliyor.',e:0,k:1,item:'hilti'},
+                {m:'Küçük bir kız oyuncak ayısını enkazda unutmuş. İçeri dönmek istiyor, tutuyorsunuz.',e:-1,k:0}
             ],
             lojistik:[
-                {m:'Malzeme takviyesi mevcut',e:2,k:0,item:'su'},
-                {m:'Malzeme eksik, organizasyon gerekli',e:0,k:0,item:'su'},
-                {m:'Kaynak bulundu, ekip güçleniyor',e:1,k:0},
-                {m:'Araç arızası',e:-1,k:0},
-                {m:'Item buldunuz!',item_bul:'su'}
+                {m:'Yardım kamyonu geldi ama iki bölge arasında kalakaldınız. Sadece birine gidebilirsiniz.',secim:true,s1:{m:'Hastaları tercih et',k:2},s2:{m:'Daha fazla ekip al',e:2}},
+                {m:'Su deposu bulundu! Ama başka bir ekip de aynı anda ulaştı. Paylaşsanız yarı yarıya.',secim:true,s1:{m:'Hepsini al',e:2,k:0},s2:{m:'Paylaş',e:1,item_bul:'su'}},
+                {m:'Telsiz arabasında acil malzeme var. Ama orada kalmak sizi geciktirecek.',secim:true,s1:{m:'Malzemeleri topla',item_bul:'su',e:1},s2:{m:'Zaman kaybetme',e:-1}},
+                {m:'Bir market sahibi size yiyecek veriyor. "Ailem için saklıyordum" diyor hüzünle.',e:1,k:0},
+                {m:'Yakıt deposu buluyor ekibiniz. Yeterince var, ilerlemek kolaylaşacak.',e:2,k:0},
+                {m:'Jeneratör çalışmıyor. Tamir etmek 1 kişinizi ayıracak ama hastane elektriğe ihtiyaç duyuyor.',secim:true,s1:{m:'Birini bırak, tamir et',e:-1,k:2},s2:{m:'Jeneratörü bırak',e:0,k:0}}
             ],
             saglik:[
-                {m:'Yaralılar tedavi edilebilir',e:0,k:1,item:'saglik'},
-                {m:'Dinlenme alanı bulundu',e:1,k:0},
-                {m:'3 yaralı kurtarılabilir',e:0,k:3,item:'saglik'},
-                {m:'Malzeme eksik',e:-1,k:0},
-                {m:'Item buldunuz!',item_bul:'saglik'}
+                {m:'İki hasta kritik durumda. Biri yaşlı, diğeri çocuk. Malzemeniz sadece birine yetiyor.',secim:true,s1:{m:'Yaşlıyı kurtar',k:1,item:'saglik'},s2:{m:'Çocuğu kurtar',k:1,item:'saglik'}},
+                {m:'Yaralı bir kadın, "Ben iyiyim, lütfen oğluma bakın" diyor. Ama o daha ağır yaralı.',e:0,k:2,item:'saglik'},
+                {m:'Sağlık ekibi sizden yardım istiyor. 3 ağır yaralı var ama ekibiniz yorulacak.',secim:true,s1:{m:'Yardım et',e:-1,k:3,item:'saglik'},s2:{m:'Kendi yoluna devam',e:1,k:0}},
+                {m:'Bir eczane buluyorsunuz. İlaçlar duruyor ama sahipleri yok, almak doğru mu?',secim:true,s1:{m:'İlaçları al',item_bul:'saglik',e:0},s2:{m:'Dokunma',e:-1,k:0}},
+                {m:'Yaralı bir doktor var. Siz onu kurtarırsanız o daha çok kişiyi kurtarabilir.',e:0,k:1,item:'saglik'},
+                {m:'Ekibinizden biri bayıldı. Dinlenme şart ama acil vakaları bekleyenler var.',secim:true,s1:{m:'Dinlen, gücünü topla',e:1,k:0},s2:{m:'Yorgun da olsa devam',e:-1,k:2,item:'saglik'}}
             ],
             koordinasyon:[
-                {m:'İyi koordinasyon fırsatı!',e:1,k:0,item:'telsiz'},
-                {m:'Haberleşme zorluğu',e:-1,k:0},
-                {m:'Uzman ekip katılabilir',e:1,k:0,item:'telsiz'},
-                {m:'İletişim kopukluğu',e:-1,k:0},
-                {m:'Item buldunuz!',item_bul:'telsiz'}
+                {m:'İki farklı noktadan yardım çağrısı geliyor. Telsiz var mı diye soruyorlar.',secim:true,s1:{m:'İkisine de ulaş',item_bul:'telsiz',e:1},s2:{m:'Birine odaklan',e:0,k:1}},
+                {m:'Koordinasyon merkezi mesaj gönderiyor: "Kuzey bölgeye git" ama güneyde çığlıklar duyuyorsunuz.',secim:true,s1:{m:'Emirlere uy',e:2,k:0},s2:{m:'İçgüdünü dinle',e:0,k:2,item:'telsiz'}},
+                {m:'Haberleşme kulesi çökmüş. Tamir ederseniz tüm ekipler iletişime geçebilir.',secim:true,s1:{m:'Kuleyi tamir et',e:-1,item_bul:'telsiz'},s2:{m:'Vaktim yok',e:1,k:0}},
+                {m:'Başka bir kurtarma ekibi yolunu kaybetmiş. Onlara rehberlik ederseniz beraber çalışabilirsiniz.',e:1,k:0,item:'telsiz'},
+                {m:'Telsiz frekansında bir baba oğlunu arıyor. Siz yardım edebilirsiniz belki.',secim:true,s1:{m:'Aramaya yardım et',e:0,k:1,item:'telsiz'},s2:{m:'Göreve odaklan',e:1,k:0}},
+                {m:'Komuta merkezi yeni ekip gönderiyor. Koordine ederseniz daha etkili olacaklar.',e:2,k:0}
             ]
         };
         
