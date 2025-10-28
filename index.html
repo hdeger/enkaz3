@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlk 72 Saat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: linear-gradient(135deg, #1e293b, #334155); padding: 20px; color: white; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .baslik { text-align: center; margin-bottom: 20px; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; backdrop-filter: blur(10px); }
+        .baslik h1 { font-size: 2.5em; color: #fbbf24; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .baslik p { color: #94a3b8; margin-top: 5px; }
+        .oyun-paneli { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .durum-panel { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; backdrop-filter: blur(10px); }
+        .stat { display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 10px; font-size: 1.1em; }
+        .konum-panel { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; backdrop-filter: blur(10px); text-align: center; }
+        .konum-ikon { font-size: 4em; margin: 10px 0; }
+        .zar-btn { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 15px 40px; border-radius: 10px; font-size: 1.3em; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .zar-btn:hover { transform: scale(1.05); }
+        .zar-btn:disabled { background: #6b7280; cursor: not-allowed; transform: scale(1); }
+        .zar-sonuc { margin-top: 15px; font-size: 2.5em; font-weight: bold; color: #fbbf24; }
+        .envanter { background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; backdrop-filter: blur(10px); }
+        .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+        .item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        .item:hover { transform: translateY(-3px); border-color: #fbbf24; }
+        .item-ikon { font-size: 2em; margin-bottom: 5px; }
+        .tahta { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px; backdrop-filter: blur(10px); margin-bottom: 20px; }
+        .ilerleme-bar { background: rgba(0,0,0,0.3); height: 30px; border-radius: 15px; overflow: hidden; margin-bottom: 10px; }
+        .ilerleme { background: linear-gradient(90deg, #3b82f6, #8b5cf6); height: 100%; transition: width 0.5s; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.aktif { display: flex; }
+        .modal-icerik { background: linear-gradient(135deg, #1e293b, #334155); border-radius: 15px; padding: 30px; max-width: 500px; width: 90%; position: relative; border: 2px solid rgba(251, 191, 36, 0.3); }
+        .kapat-btn { position: absolute; top: 15px; right: 15px; background: #ef4444; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.3em; }
+        .aksiyon-butonlar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .aksiyon-btn { padding: 12px; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; font-weight: bold; transition: transform 0.2s; }
+        .aksiyon-btn:hover { transform: scale(1.05); }
+        .kullan-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .devam-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
+        .item-secim { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin: 15px 0; }
+        h2 { color: #fbbf24; margin-bottom: 15px; }
+        h3 { margin-bottom: 15px; }
+        @media (max-width: 768px) {
+            .oyun-paneli { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="baslik">
+            <h1>İlk 72 Saat</h1>
+            <p>Afet Yönetimi - Hayatta Kalma Modu</p>
+        </div>
+        
+        <div class="oyun-paneli">
+            <div class="durum-panel">
+                <h3>📊 Durum</h3>
+                <div class="stat"><span>👥 Ekip</span><span id="ekip">6</span></div>
+                <div class="stat"><span>❤️ Kurtarılan</span><span id="kurtarilan">0</span></div>
+                <div class="stat"><span>📍 Konum</span><span id="konum-no">0/40</span></div>
+            </div>
+            
+            <div class="konum-panel">
+                <h3>📍 Mevcut Konum</h3>
+                <div class="konum-ikon" id="konum-ikon">🏁</div>
+                <div id="konum-isim" style="font-size:1.2em;margin-bottom:15px;">Başlangıç</div>
+                <button class="zar-btn" id="zar-btn" onclick="zar()">🎲 Zar At</button>
+                <div class="zar-sonuc" id="zar-sonuc"></div>
+            </div>
+        </div>
+        
+        <div class="tahta">
+            <h3>🗺️ İlerleme</h3>
+            <div class="ilerleme-bar">
+                <div class="ilerleme" id="ilerleme" style="width:0%">0/40</div>
+            </div>
+        </div>
+        
+        <div class="envanter">
+            <h3>🎒 Envanter</h3>
+            <div class="item-grid" id="envanter"></div>
+        </div>
+    </div>
+    
+    <div class="modal" id="modal">
+        <div class="modal-icerik">
+            <button class="kapat-btn" onclick="kapat()">×</button>
+            <h2 id="baslik"></h2>
+            <p id="mekan" style="color:#94a3b8;margin:10px 0;font-size:1.1em;"></p>
+            <div id="metin" style="padding:15px;background:rgba(0,0,0,0.3);border-radius:8px;margin:15px 0;"></div>
+            <div id="etki"></div>
+            <div id="aksiyon-alan"></div>
+        </div>
+    </div>
+    
+    <script>
+        let oyun={
+            ekip:6,
+            kurtarilan:0,
+            poz:0,
+            zar:null,
+            kart:null,
+            envanter:[],
+            tahta:[]
+        };
+        
+        const items={
+            hilti:{isim:'Hilti',ikon:'🔨',aciklama:'Enkaz kurtarmalarında 2 katı etkili'},
+            saglik:{isim:'Sağlık Çantası',ikon:'💊',aciklama:'Sağlık müdahalelerinde 2 katı etkili'},
+            telsiz:{isim:'Telsiz',ikon:'📻',aciklama:'Koordinasyon görevlerinde 2 katı etkili'},
+            su:{isim:'Su Bidonu',ikon:'💧',aciklama:'Lojistik görevlerinde 2 katı etkili'}
+        };
+        
+        const yer={
+            enkaz:['Lale Apt','Çınar İş','Gül Site','Kardelen','Papatya','Zambak','Orkide','Menekşe','Yasemin','Fulya'],
+            lojistik:['Merkez','Yardım','İkmal','Lojistik','Depo','Tedarik','Dağıtım','Stok','Destek','Kaynak'],
+            saglik:['Sağlık','Eczane','Acil','İlk Yardım','Bakım','Tıbbi','Ambulans','Tedavi','Merkez','Klinik'],
+            koordinasyon:['Kriz','Komuta','İletişim','Koordine','Operasyon','Yönetim','Planlama','Kontrol','Bilgi','Merkez']
+        };
+        
+        const kart={
+            enkaz:[
+                {m:'Çocuk kurtarılabilir!',e:1,k:1,item:'hilti'},
+                {m:'2 kişi sıkışmış durumda',e:-1,k:2,item:'hilti'},
+                {m:'3 kişi kurtarılabilir!',e:0,k:3,item:'hilti'},
+                {m:'Enkaz tehlikeli görünüyor',e:-2,k:0},
+                {m:'Aile kurtarılabilir',e:1,k:2,item:'hilti'},
+                {m:'Item buldunuz!',item_bul:'hilti'}
+            ],
+            lojistik:[
+                {m:'Malzeme takviyesi mevcut',e:2,k:0,item:'su'},
+                {m:'Malzeme eksik, organizasyon gerekli',e:0,k:0,item:'su'},
+                {m:'Kaynak bulundu, ekip güçleniyor',e:1,k:0},
+                {m:'Araç arızası',e:-1,k:0},
+                {m:'Item buldunuz!',item_bul:'su'}
+            ],
+            saglik:[
+                {m:'Yaralılar tedavi edilebilir',e:0,k:1,item:'saglik'},
+                {m:'Dinlenme alanı bulundu',e:1,k:0},
+                {m:'3 yaralı kurtarılabilir',e:0,k:3,item:'saglik'},
+                {m:'Malzeme eksik',e:-1,k:0},
+                {m:'Item buldunuz!',item_bul:'saglik'}
+            ],
+            koordinasyon:[
+                {m:'İyi koordinasyon fırsatı!',e:1,k:0,item:'telsiz'},
+                {m:'Haberleşme zorluğu',e:-1,k:0},
+                {m:'Uzman ekip katılabilir',e:1,k:0,item:'telsiz'},
+                {m:'İletişim kopukluğu',e:-1,k:0},
+                {m:'Item buldunuz!',item_bul:'telsiz'}
+            ]
+        };
+        
+        function baslat(){
+            let d=[];
+            ['enkaz','lojistik','saglik','koordinasyon'].forEach(t=>{
+                for(let i=0;i<10;i++)d.push({tip:t,isim:yer[t][i]});
+            });
+            d.sort(()=>Math.random()-0.5);
+            oyun.tahta=d.map((k,i)=>({id:i,...k}));
+            ciz();
+        }
+        
+        function ikon(t){
+            return{enkaz:'🏚️',lojistik:'📦',saglik:'🏥',koordinasyon:'📡'}[t];
+        }
+        
+        function ciz(){
+            document.getElementById('ekip').textContent=oyun.ekip;
+            document.getElementById('kurtarilan').textContent=oyun.kurtarilan;
+            document.getElementById('konum-no').textContent=oyun.poz+'/40';
+            
+            let k=oyun.tahta[oyun.poz];
+            if(k){
+                document.getElementById('konum-ikon').textContent=ikon(k.tip);
+                document.getElementById('konum-isim').textContent=k.isim;
+            }else{
+                document.getElementById('konum-ikon').textContent='🏁';
+                document.getElementById('konum-isim').textContent='Başlangıç';
+            }
+            
+            let ilerleme=(oyun.poz/40)*100;
+            document.getElementById('ilerleme').style.width=ilerleme+'%';
+            document.getElementById('ilerleme').textContent=oyun.poz+'/40';
+            
+            let e=document.getElementById('envanter'),h='';
+            if(oyun.envanter.length==0){
+                h='<div style="text-align:center;color:#94a3b8;padding:20px;">Henüz item yok</div>';
+            }else{
+                oyun.envanter.forEach((it,i)=>{
+                    let item=items[it];
+                    h+='<div class="item"><div class="item-ikon">'+item.ikon+'</div><div>'+item.isim+'</div></div>';
+                });
+            }
+            document.getElementById('envanter').innerHTML=h;
+            
+            document.getElementById('zar-btn').disabled=(oyun.ekip<=0);
+        }
+        
+        function zar(){
+            if(oyun.ekip<=0)return;
+            oyun.zar=Math.floor(Math.random()*6)+1;
+            oyun.poz=Math.min(oyun.poz+oyun.zar,39);
+            document.getElementById('zar-sonuc').textContent=oyun.zar;
+            ciz();
+            
+            if(oyun.poz>=39){
+                setTimeout(()=>alert('🎉 Oyunu Tamamladınız!\n\nEkip: '+oyun.ekip+'\nKurtarılan: '+oyun.kurtarilan),500);
+                return;
+            }
+            
+            setTimeout(()=>kartCek(),500);
+        }
+        
+        function kartCek(){
+            let k=oyun.tahta[oyun.poz];
+            let kartlar=kart[k.tip];
+            let secilen=kartlar[Math.floor(Math.random()*kartlar.length)];
+            oyun.kart={...secilen,tip:k.tip};
+            goster(secilen,k.tip);
+        }
+        
+        function goster(k,t){
+            document.getElementById('baslik').textContent={enkaz:'🏚️ Enkaz Alanı',lojistik:'📦 Lojistik',saglik:'🏥 Sağlık',koordinasyon:'📡 Koordinasyon'}[t];
+            document.getElementById('mekan').textContent=oyun.tahta[oyun.poz].isim;
+            document.getElementById('metin').textContent=k.m;
+            
+            let e='';
+            if(k.item_bul){
+                let it=items[k.item_bul];
+                e='<div style="background:rgba(34,197,94,0.2);padding:15px;border-radius:8px;border:2px solid #22c55e"><b>✨ Item Bulundu!</b><div style="font-size:2em;margin:10px 0">'+it.ikon+'</div><b>'+it.isim+'</b><p style="margin-top:5px;color:#94a3b8">'+it.aciklama+'</p></div>';
+                let btn='<div class="aksiyon-butonlar"><button class="aksiyon-btn devam-btn" style="grid-column:1/3" onclick="itemAl()">Al ve Devam Et</button></div>';
+                document.getElementById('etki').innerHTML=e;
+                document.getElementById('aksiyon-alan').innerHTML=btn;
+            }else if(k.item){
+                let it=items[k.item];
+                let varMi=oyun.envanter.includes(k.item);
+                
+                if(k.e||k.k){
+                    e='<div style="background:rgba(239,68,68,0.2);padding:15px;border-radius:8px;border:2px solid #ef4444;margin-bottom:15px"><b>⚠️ Durum:</b>';
+                    if(k.e)e+='<div>👥 Ekip: '+(k.e>0?'+':'')+k.e+'</div>';
+                    if(k.k)e+='<div>❤️ Kurtarılabilir: +'+k.k+'</div>';
+                    e+='</div>';
+                }
+                
+                if(varMi){
+                    e+='<div class="item-secim"><b>🎒 '+it.isim+' kullanılabilir!</b><p style="color:#94a3b8;margin-top:8px">Kullanırsanız 2 katı etkili olur ('+k.k+' → '+(k.k*2)+' kişi)</p></div>';
+                    let btn='<div class="aksiyon-butonlar"><button class="aksiyon-btn kullan-btn" onclick="itemKullan()">'+it.ikon+' Kullan</button><button class="aksiyon-btn devam-btn" onclick="uygula(false)">Kullanma</button></div>';
+                    document.getElementById('aksiyon-alan').innerHTML=btn;
+                }else{
+                    e+='<div style="background:rgba(100,116,139,0.2);padding:15px;border-radius:8px;margin-top:15px"><b>ℹ️ Bilgi:</b><p style="margin-top:8px">'+it.isim+' olsaydı 2 katı etkili olabilirdiniz</p></div>';
+                    let btn='<div class="aksiyon-butonlar"><button class="aksiyon-btn devam-btn" style="grid-column:1/3" onclick="uygula(false)">Devam Et</button></div>';
+                    document.getElementById('aksiyon-alan').innerHTML=btn;
+                }
+                
+                document.getElementById('etki').innerHTML=e;
+            }else{
+                if(k.e||k.k){
+                    e='<div style="background:rgba(239,68,68,0.2);padding:15px;border-radius:8px;border:2px solid #ef4444"><b>⚠️ Etki:</b>';
+                    if(k.e)e+='<div>👥 '+(k.e>0?'+':'')+k.e+'</div>';
+                    if(k.k)e+='<div>❤️ +'+k.k+'</div>';
+                    e+='</div>';
+                }
+                document.getElementById('etki').innerHTML=e;
+                let btn='<div class="aksiyon-butonlar"><button class="aksiyon-btn devam-btn" style="grid-column:1/3" onclick="uygula(false)">Devam Et</button></div>';
+                document.getElementById('aksiyon-alan').innerHTML=btn;
+            }
+            
+            document.getElementById('modal').classList.add('aktif');
+        }
+        
+        function itemAl(){
+            let k=oyun.kart;
+            oyun.envanter.push(k.item_bul);
+            kapat();
+            ciz();
+        }
+        
+        function itemKullan(){
+            uygula(true);
+        }
+        
+        function kapat(){
+            document.getElementById('modal').classList.remove('aktif');
+        }
+        
+        function uygula(itemKullanildi){
+            let k=oyun.kart;
+            let carpan=itemKullanildi?2:1;
+            
+            if(k.item&&itemKullanildi){
+                let idx=oyun.envanter.indexOf(k.item);
+                if(idx>-1)oyun.envanter.splice(idx,1);
+            }
+            
+            oyun.ekip+=(k.e||0);
+            oyun.kurtarilan+=(k.k||0)*carpan;
+            
+            if(oyun.ekip<=0){
+                kapat();
+                setTimeout(()=>alert('💀 Ekibiniz tükendi!\n\nKurtarılan: '+oyun.kurtarilan+'\nKonum: '+oyun.poz+'/40'),300);
+                oyun.ekip=0;
+                ciz();
+                return;
+            }
+            
+            kapat();
+            ciz();
+            document.getElementById('zar-sonuc').textContent='';
+        }
+        
+        window.onload=baslat;
+    </script>
+</body>
+</html>
