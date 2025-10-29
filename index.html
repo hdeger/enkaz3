@@ -533,28 +533,98 @@
             'iletisim': 'İletişim'
         };
 
-        // Kart Desteleri (kısa versiyon - test için)
+        // Kart Desteleri - TAM VERSİYON
         const cardDecks = {
             enkaz: [
                 {
                     title: "Çökmüş Bina",
-                    scenario: "Büyük bir binanın altında 4 kişinin sıkıştığı görülüyor.",
+                    scenario: "Büyük bir binanın altında 4 kişinin sıkıştığı görülüyor. Kurtarma sonrası ekip yorulacak.",
                     choices: [
                         { text: "Kurtarmaya başla (Zar at: 4+ ise 4 kişi kurtar ama ekipten 1 kaybet, 3- ise 2 kişi kurtar ve ekipten 2 kaybet)", action: "diceCheck", threshold: 4, successRescue: 4, successTeamLoss: 1, failRescue: 2, failTeam: -2 }
                     ]
                 },
                 {
                     title: "Artçı Sarsıntı",
-                    scenario: "Enkaz bölgesinde artçı sarsıntı!",
+                    scenario: "Enkaz bölgesindeyken artçı sarsıntı oldu! Zar at.",
                     choices: [
                         { text: "Devam et (Zar at: 5+ ise 3 kişi kurtar, 4- ise ekipten 2 kaybet)", action: "diceCheck", threshold: 5, successRescue: 3, failTeam: -2 }
+                    ]
+                },
+                {
+                    title: "Kalın Beton Duvar",
+                    scenario: "Enkaz altında 3 kişi var ama kalın beton duvar var. Zorlu bir operasyon. (Hilti eşiği düşürür)",
+                    choices: [
+                        { text: "Duvarı kır (Zar at: 5+ ise 3 kurtar, ekipten 1 kaybet, 4- ise sadece ekipten 2 kaybet)", action: "diceCheck", threshold: 5, successRescue: 3, successTeamLoss: 1, failTeam: -2, canUseHilti: true }
+                    ]
+                },
+                {
+                    title: "Sesler Geliyor",
+                    scenario: "Enkazdan yardım çağrısı var. Hızlı hareket et!",
+                    choices: [
+                        { text: "Müdahale et (3 kişi kurtar, ekipten 1 yorgun düşer)", action: "rescue", rescue: 3, teamLoss: 1 }
+                    ]
+                },
+                {
+                    title: "Derin Enkaz",
+                    scenario: "Çok derin enkaz. 5 kişinin olduğu tahmin ediliyor. (Kurtarma köpeği avantaj sağlar)",
+                    choices: [
+                        { text: "Kurtarmayı dene (Zar at: 6 ise 5 kurtar ekipten 1 kaybet, 3-5 ise 2 kurtar ekipten 2 kaybet, 2- ise ekipten 3 kaybet)", action: "diceDeepRescue", canUseDog: true }
+                    ]
+                },
+                {
+                    title: "Göçük Riski",
+                    scenario: "Enkaz çok kararsız. Tehlikeli!",
+                    choices: [
+                        { text: "Kurtarmayı dene (Zar at: 4+ ise 3 kurtar ve ekipten 1 kaybet, 3- ise sadece ekipten 2 kaybet)", action: "diceCheck", threshold: 4, successRescue: 3, successTeamLoss: 1, failTeam: -2 }
+                    ]
+                },
+                {
+                    title: "Yaralı Vatandaş",
+                    scenario: "Enkaz altında ağır yaralı 2 kişi var. Dikkatli olmalısın. (İlk yardım çantası +1 kurtarma)",
+                    choices: [
+                        { text: "Kurtar (Zar at: 4+ ise 2 kurtar, 3- ise 1 kurtar, her durumda ekipten 1 kaybet)", action: "diceCheck", threshold: 4, successRescue: 2, failRescue: 1, alwaysTeamLoss: 1, canUseFirstAid: true }
+                    ]
+                },
+                {
+                    title: "Karanlık Bodrum",
+                    scenario: "Karanlık bodrum katında 3 kişi var. (Jeneratör çok yardımcı olur)",
+                    choices: [
+                        { text: "İlerle (Zar at: 5+ ise 3 kurtar ekipten 1 kaybet, 4- ise ekipten 2 kaybet)", action: "diceCheck", threshold: 5, successRescue: 3, successTeamLoss: 1, failTeam: -2, canUseGenerator: true }
+                    ]
+                },
+                {
+                    title: "Çocuk Sesleri",
+                    scenario: "Enkazdan çocuk sesleri geliyor!",
+                    choices: [
+                        { text: "Hemen kurtar (2 çocuk kurtar ama ekip çok yorulur, ekipten 2 kaybet)", action: "rescue", rescue: 2, teamLoss: 2 }
+                    ]
+                },
+                {
+                    title: "Gaz Kaçağı",
+                    scenario: "Enkaz altında gaz kaçağı var! Çok tehlikeli.",
+                    choices: [
+                        { text: "Müdahale et (Zar at: 5+ ise 2 kurtar ekipten 1 kaybet, 4- ise kurtarma yok ekipten 3 kaybet)", action: "diceCheck", threshold: 5, successRescue: 2, successTeamLoss: 1, failTeam: -3 }
+                    ]
+                },
+                {
+                    title: "Ezilme Sendromu",
+                    scenario: "Enkaz altında uzun süre kalmış 2 kişi var. Zor durum.",
+                    choices: [
+                        { text: "Acil kurtar (2 kişi kurtar ama ekipten 2 yorgun düşer)", action: "rescue", rescue: 2, teamLoss: 2 }
+                    ]
+                },
+                {
+                    title: "Ağır Enkaz",
+                    scenario: "Çok ağır bir beton blok altında 3 kişi sıkışmış.",
+                    choices: [
+                        { text: "Kaldırmayı dene (Zar at: 5+ ise 3 kurtar ekipten 1 kaybet, 4- ise 1 kurtar ekipten 2 kaybet)", action: "diceCheck", threshold: 5, successRescue: 3, successTeamLoss: 1, failRescue: 1, failTeam: -2 }
                     ]
                 }
             ],
             saglik: [
                 {
                     title: "Sağlık Çadırı",
-                    scenario: "Sağlık çadırına ulaştınız.",
+                    scenario: "Sağlık çadırına ulaştınız. Ekibiniz dinlenebilir.",
                     choices: [
                         { text: "Tam dinlenme (+2 ekip üyesi)", action: "teamGain", gain: 2 }
                     ]
@@ -563,39 +633,165 @@
                     title: "İlk Yardım Malzemesi",
                     scenario: "İlk yardım malzemesi var. Zar at!",
                     choices: [
-                        { text: "Zar at (4+ ise ilk yardım çantası, 3- ise +1 ekip)", action: "diceItem", threshold: 4, item: "ilkYardim", failGain: 1 }
+                        { text: "Zar at (4+ ise ilk yardım çantası kazan, 3- ise +1 ekip)", action: "diceItem", threshold: 4, item: "ilkYardim", failGain: 1 }
+                    ]
+                },
+                {
+                    title: "Ekipte Yaralanma",
+                    scenario: "Ekipten 1 kişi yaralandı ve tedavi için ayrılması gerekiyor.",
+                    choices: [
+                        { text: "Tedavi ettir (Ekipten 1 kaybet ama ilk yardım çantası kazan)", action: "tradeTeamForItem", teamLoss: 1, item: "ilkYardim" }
+                    ]
+                },
+                {
+                    title: "Tıbbi Malzeme Deposu",
+                    scenario: "Tıbbi malzeme deposuna ulaştınız.",
+                    choices: [
+                        { text: "Malzeme al (İlk yardım çantası kazan)", action: "getItem", item: "ilkYardim" }
+                    ]
+                },
+                {
+                    title: "Ekipte Hastalık",
+                    scenario: "Ekipten birisi hastalandı.",
+                    choices: [
+                        { text: "İstirahat ettir (Ekipten 1 kaybet)", action: "teamLoss", loss: 1 }
+                    ]
+                },
+                {
+                    title: "Psikolojik Yıpranma",
+                    scenario: "Ekip çok yorgun. Zar at!",
+                    choices: [
+                        { text: "Zar at (4+ ise +3 ekip, 3- ise +1 ekip)", action: "diceLuck", threshold: 4, successGain: 3, failGain: 1 }
+                    ]
+                },
+                {
+                    title: "Akraba Haberi",
+                    scenario: "Ekipten birisi ailesinden acil haber aldı ve gitmek istiyor.",
+                    choices: [
+                        { text: "İzin ver (Ekipten 1 kaybet)", action: "teamLoss", loss: 1 }
+                    ]
+                },
+                {
+                    title: "Ambulans Desteği",
+                    scenario: "Ambulans geldi. Destek alabilisiniz.",
+                    choices: [
+                        { text: "Ekibi muayene ettir (+2 ekip üyesi)", action: "teamGain", gain: 2 }
                     ]
                 }
             ],
             lojistik: [
                 {
                     title: "Ekipman Deposu",
-                    scenario: "Lojistik deposunda ekipman var.",
+                    scenario: "Lojistik deposunda ekipman var. Zar at!",
                     choices: [
-                        { text: "Zar at (5+ Hilti, 3-4 Jeneratör, 2- +1 ekip)", action: "diceMultiItem", highItem: "hilti", midItem: "jenerator", failGain: 1 }
+                        { text: "Zar at (5+ ise Hilti, 3-4 ise Jeneratör, 2- ise +1 ekip)", action: "diceMultiItem", highItem: "hilti", midItem: "jenerator", failGain: 1 }
                     ]
                 },
                 {
                     title: "Gönüllü Yardımı",
                     scenario: "Gönüllüler yardım etmek istiyor.",
                     choices: [
-                        { text: "Kabul et (+3 ekip üyesi)", action: "teamGain", gain: 3 }
+                        { text: "Gönüllüleri kabul et (+3 ekip üyesi)", action: "teamGain", gain: 3 }
+                    ]
+                },
+                {
+                    title: "Araç Arızası",
+                    scenario: "Kurtarma aracınız arızalandı. Tamirci çağırmalısınız.",
+                    choices: [
+                        { text: "Tamir için bekle (Ekipten 1 kişi tamirde kalır)", action: "teamLoss", loss: 1 }
+                    ]
+                },
+                {
+                    title: "İtfaiye Desteği",
+                    scenario: "İtfaiye ekibi özel ekipman sunuyor.",
+                    choices: [
+                        { text: "Hilti al (Kesici alet)", action: "getItem", item: "hilti" }
+                    ]
+                },
+                {
+                    title: "Yakıt Sıkıntısı",
+                    scenario: "Yakıt azaldı. Ekipten biri yakıt getirmeye gidecek.",
+                    choices: [
+                        { text: "Yakıt getirt (Ekipten 1 kaybet ama Jeneratör kazan)", action: "tradeTeamForItem", teamLoss: 1, item: "jenerator" }
+                    ]
+                },
+                {
+                    title: "K9 Birimi",
+                    scenario: "Kurtarma köpeği birimi ile iletişime geçtiniz.",
+                    choices: [
+                        { text: "Kurtarma köpeği al", action: "getItem", item: "kurtarmaKopegi" }
+                    ]
+                },
+                {
+                    title: "Malzeme Eksikliği",
+                    scenario: "Önemli malzemeler eksik. Zar at!",
+                    choices: [
+                        { text: "Zar at (4+ ise Drone kazan, 3- ise +1 ekip)", action: "diceItem", threshold: 4, item: "drone", failGain: 1 }
+                    ]
+                },
+                {
+                    title: "Yol Kapanması",
+                    scenario: "Yol kapalı. Ekipten biri yol açmak için ayrılacak.",
+                    choices: [
+                        { text: "Yol aç (Ekipten 1 kaybet)", action: "teamLoss", loss: 1 }
                     ]
                 }
             ],
             iletisim: [
                 {
                     title: "İletişim Merkezi",
-                    scenario: "Merkez ile bağlantı kurabilirsiniz.",
+                    scenario: "Merkez ile bağlantı kurabilirsiniz. Zar at!",
                     choices: [
-                        { text: "Zar at (5+ Telsiz, 4- +2 ekip)", action: "diceItem", threshold: 5, item: "telsiz", failGain: 2 }
+                        { text: "Zar at (5+ ise Telsiz kazan, 4- ise +2 ekip)", action: "diceItem", threshold: 5, item: "telsiz", failGain: 2 }
                     ]
                 },
                 {
                     title: "Acil Durum Hattı",
-                    scenario: "112'den destek alabilirsiniz.",
+                    scenario: "112 acil hattından destek alabilirsiniz.",
                     choices: [
-                        { text: "Ekip takviyesi (+3 ekip üyesi)", action: "teamGain", gain: 3 }
+                        { text: "Ekip takviyesi iste (+3 ekip üyesi)", action: "teamGain", gain: 3 }
+                    ]
+                },
+                {
+                    title: "Telsiz Arızası",
+                    scenario: "Telsiziniz bozuldu. Tamire göndermelisiniz.",
+                    choices: [
+                        { text: "Tamire gönder (Ekipten 1 kaybet ama yeni Telsiz kazan)", action: "tradeTeamForItem", teamLoss: 1, item: "telsiz" }
+                    ]
+                },
+                {
+                    title: "Koordinasyon Toplantısı",
+                    scenario: "Koordinasyon toplantısı yapılıyor.",
+                    choices: [
+                        { text: "Toplantıya katıl (+2 ekip üyesi bilgi alır)", action: "teamGain", gain: 2 }
+                    ]
+                },
+                {
+                    title: "Yanlış Bilgi",
+                    scenario: "Yanlış konum bilgisi geldi. Ekip boşa yoruldu.",
+                    choices: [
+                        { text: "Geri dön (Ekipten 1 yorgun düşer)", action: "teamLoss", loss: 1 }
+                    ]
+                },
+                {
+                    title: "Helikopter Desteği",
+                    scenario: "Havadan destek alabilisiniz. Zar at!",
+                    choices: [
+                        { text: "Zar at (4+ ise Drone, 3- ise +1 ekip)", action: "diceItem", threshold: 4, item: "drone", failGain: 1 }
+                    ]
+                },
+                {
+                    title: "Acil Çağrı",
+                    scenario: "Başka bölgeden acil yardım istendi. Ekipten 2 kişi göndermelisiniz.",
+                    choices: [
+                        { text: "Yardım gönder (Ekipten 2 kaybet)", action: "teamLoss", loss: 2 }
+                    ]
+                },
+                {
+                    title: "Uydu Telefonu",
+                    scenario: "Uydu telefonu bulundu.",
+                    choices: [
+                        { text: "Al (Telsiz kazan)", action: "getItem", item: "telsiz" }
                     ]
                 }
             ]
@@ -828,33 +1024,31 @@
             const modal = document.getElementById('cardModal');
             
             switch(choice.action) {
-                case 'teamGain':
-                    currentPlayer.team += choice.gain;
-                    addLog(`${currentPlayer.name} +${choice.gain} ekip kazandı!`, 'resource');
+                case 'getItem':
+                    if (!currentPlayer.items.includes(choice.item)) {
+                        currentPlayer.items.push(choice.item);
+                        const itemData = items[choice.item];
+                        addLog(`${currentPlayer.name} ${itemData.icon} ${itemData.name} kazandı!`, 'resource');
+                    } else {
+                        currentPlayer.team += 2;
+                        addLog(`${currentPlayer.name} zaten bu item var, +2 ekip bonusu kazandı!`, 'resource');
+                    }
                     break;
                     
-                case 'diceCheck':
-                    const dice = Math.floor(Math.random() * 6) + 1;
-                    addLog(`${currentPlayer.name} zar attı: ${dice}`);
+                case 'teamLoss':
+                    currentPlayer.team -= choice.loss;
+                    addLog(`${currentPlayer.name} ekipten ${choice.loss} üye kaybetti.`, 'injury');
+                    break;
                     
-                    if (dice >= choice.threshold) {
-                        if (choice.successRescue) {
-                            currentPlayer.rescued += choice.successRescue;
-                            addLog(`Başarılı! ${choice.successRescue} kişi kurtarıldı!`, 'rescue');
-                        }
-                        if (choice.successTeamLoss) {
-                            currentPlayer.team -= choice.successTeamLoss;
-                            addLog(`Ekipten ${choice.successTeamLoss} kayıp.`, 'injury');
-                        }
+                case 'tradeTeamForItem':
+                    currentPlayer.team -= choice.teamLoss;
+                    if (!currentPlayer.items.includes(choice.item)) {
+                        currentPlayer.items.push(choice.item);
+                        const itemData = items[choice.item];
+                        addLog(`${currentPlayer.name} ekipten ${choice.teamLoss} vererek ${itemData.icon} ${itemData.name} kazandı!`, 'resource');
                     } else {
-                        if (choice.failRescue) {
-                            currentPlayer.rescued += choice.failRescue;
-                            addLog(`${choice.failRescue} kişi kurtarıldı.`, 'rescue');
-                        }
-                        if (choice.failTeam) {
-                            currentPlayer.team += choice.failTeam;
-                            addLog(`Ekipten ${Math.abs(choice.failTeam)} kayıp!`, 'injury');
-                        }
+                        currentPlayer.team += 1;
+                        addLog(`${currentPlayer.name} zaten item var, ekipten ${choice.teamLoss} kayıp oldu ama +1 ekip bonusu.`, 'resource');
                     }
                     break;
                     
@@ -865,14 +1059,15 @@
                     if (itemDice >= choice.threshold) {
                         if (!currentPlayer.items.includes(choice.item)) {
                             currentPlayer.items.push(choice.item);
-                            addLog(`${items[choice.item].icon} ${items[choice.item].name} kazandı!`, 'resource');
+                            const itemData = items[choice.item];
+                            addLog(`Başarılı! ${itemData.icon} ${itemData.name} kazandı!`, 'resource');
                         } else {
                             currentPlayer.team += 2;
-                            addLog(`+2 ekip kazandı!`, 'resource');
+                            addLog(`Zaten item var, +2 ekip kazandı!`, 'resource');
                         }
                     } else {
                         currentPlayer.team += choice.failGain;
-                        addLog(`+${choice.failGain} ekip kazandı.`, 'resource');
+                        addLog(`+${choice.failGain} ekip üyesi kazandı.`, 'resource');
                     }
                     break;
                     
@@ -883,10 +1078,10 @@
                     if (multiDice >= 5) {
                         if (!currentPlayer.items.includes(choice.highItem)) {
                             currentPlayer.items.push(choice.highItem);
-                            addLog(`${items[choice.highItem].icon} ${items[choice.highItem].name} kazandı!`, 'resource');
+                            addLog(`Harika! ${items[choice.highItem].icon} ${items[choice.highItem].name} kazandı!`, 'resource');
                         } else {
                             currentPlayer.team += 2;
-                            addLog(`+2 ekip!`, 'resource');
+                            addLog(`Zaten var, +2 ekip kazandı!`, 'resource');
                         }
                     } else if (multiDice >= 3) {
                         if (!currentPlayer.items.includes(choice.midItem)) {
@@ -894,24 +1089,151 @@
                             addLog(`${items[choice.midItem].icon} ${items[choice.midItem].name} kazandı!`, 'resource');
                         } else {
                             currentPlayer.team += 1;
-                            addLog(`+1 ekip!`, 'resource');
+                            addLog(`Zaten var, +1 ekip kazandı!`, 'resource');
                         }
                     } else {
                         currentPlayer.team += choice.failGain;
-                        addLog(`+${choice.failGain} ekip.`, 'resource');
+                        addLog(`+${choice.failGain} ekip üyesi kazandı.`, 'resource');
                     }
+                    break;
+                    
+                case 'diceLuck':
+                    const luckDice = Math.floor(Math.random() * 6) + 1;
+                    addLog(`${currentPlayer.name} zar attı: ${luckDice}`);
+                    
+                    if (luckDice >= choice.threshold) {
+                        currentPlayer.team += choice.successGain;
+                        addLog(`Şanslı! +${choice.successGain} ekip kazandı!`, 'resource');
+                    } else {
+                        currentPlayer.team += choice.failGain;
+                        addLog(`+${choice.failGain} ekip kazandı.`, 'resource');
+                    }
+                    break;
+                
+                case 'rescue':
+                    let rescueAmount = choice.rescue;
+                    
+                    // İlk yardım çantası ile yaralı kurtarma bonusu
+                    if (choice.canUseFirstAid && currentPlayer.items.includes('ilkYardim')) {
+                        rescueAmount += 1;
+                        addLog(`${currentPlayer.name} ilk yardım çantası kullandı! +1 bonus`, 'resource');
+                    }
+                    
+                    currentPlayer.rescued += rescueAmount;
+                    addLog(`${currentPlayer.name} ${rescueAmount} kişi kurtardı! 🎉`, 'rescue');
+                    
+                    if (choice.teamLoss) {
+                        currentPlayer.team -= choice.teamLoss;
+                        addLog(`Ekip yoruldu, ${choice.teamLoss} üye kaybedildi.`, 'injury');
+                    }
+                    break;
+                    
+                case 'diceCheck':
+                    const diceResult = Math.floor(Math.random() * 6) + 1;
+                    let finalThreshold = choice.threshold;
+                    
+                    // Hilti ile beton duvar bonusu
+                    if (choice.canUseHilti && currentPlayer.items.includes('hilti')) {
+                        finalThreshold -= 2;
+                        addLog(`${currentPlayer.name} Hilti kullandı! Zar eşiği -2`, 'resource');
+                    }
+                    
+                    // Kurtarma köpeği ile derin enkaz bonusu
+                    if (choice.canUseDog && currentPlayer.items.includes('kurtarmaKopegi')) {
+                        finalThreshold -= 1;
+                        addLog(`${currentPlayer.name} kurtarma köpeği kullandı! Zar eşiği -1`, 'resource');
+                    }
+                    
+                    // Jeneratör ile karanlık bonus
+                    if (choice.canUseGenerator && currentPlayer.items.includes('jenerator')) {
+                        finalThreshold -= 2;
+                        addLog(`${currentPlayer.name} jeneratör kullandı! Zar eşiği -2`, 'resource');
+                    }
+                    
+                    addLog(`${currentPlayer.name} zar attı: ${diceResult} (Eşik: ${finalThreshold})`);
+                    
+                    if (diceResult >= finalThreshold) {
+                        if (choice.successRescue) {
+                            let bonusRescue = choice.successRescue;
+                            // İlk yardım çantası bonusu
+                            if (choice.canUseFirstAid && currentPlayer.items.includes('ilkYardim')) {
+                                bonusRescue += 1;
+                                addLog(`${currentPlayer.name} ilk yardım çantası ile +1 bonus!`, 'resource');
+                            }
+                            currentPlayer.rescued += bonusRescue;
+                            addLog(`Başarılı! ${bonusRescue} kişi kurtarıldı! 🎉`, 'rescue');
+                        }
+                        if (choice.successTeamLoss) {
+                            currentPlayer.team -= choice.successTeamLoss;
+                            addLog(`Ekip yoruldu, ${choice.successTeamLoss} üye kaybedildi.`, 'injury');
+                        }
+                    } else {
+                        if (choice.failRescue) {
+                            currentPlayer.rescued += choice.failRescue;
+                            addLog(`${choice.failRescue} kişi kurtarıldı.`, 'rescue');
+                        }
+                        if (choice.failTeam) {
+                            currentPlayer.team += choice.failTeam;
+                            addLog(`Ekipten ${Math.abs(choice.failTeam)} üye kaybedildi.`, 'injury');
+                        }
+                    }
+                    
+                    if (choice.alwaysTeamLoss) {
+                        currentPlayer.team -= choice.alwaysTeamLoss;
+                        addLog(`Zorlu operasyon, ekipten ${choice.alwaysTeamLoss} üye kaybedildi.`, 'injury');
+                    }
+                    break;
+                    
+                case 'diceDeepRescue':
+                    const deepDice = Math.floor(Math.random() * 6) + 1;
+                    let deepThreshold = 6;
+                    
+                    if (choice.canUseDog && currentPlayer.items.includes('kurtarmaKopegi')) {
+                        deepThreshold = 5;
+                        addLog(`${currentPlayer.name} kurtarma köpeği kullandı!`, 'resource');
+                    }
+                    
+                    addLog(`${currentPlayer.name} zar attı: ${deepDice}`);
+                    
+                    if (deepDice >= deepThreshold) {
+                        currentPlayer.rescued += 5;
+                        currentPlayer.team -= 1;
+                        addLog(`Mükemmel! 5 kişi kurtarıldı! Ekipten 1 yoruldu.`, 'rescue');
+                    } else if (deepDice >= 3) {
+                        currentPlayer.rescued += 2;
+                        currentPlayer.team -= 2;
+                        addLog(`2 kişi kurtarıldı ama ekipten 2 kayıp.`, 'rescue');
+                    } else {
+                        currentPlayer.team -= 3;
+                        addLog(`Kurtarma başarısız! Ekipten 3 üye kaybedildi!`, 'injury');
+                    }
+                    break;
+                    
+                case 'teamGain':
+                    currentPlayer.team += choice.gain;
+                    addLog(`${currentPlayer.name} ekibine +${choice.gain} üye ekledi!`, 'resource');
+                    break;
+                    
+                case 'skip':
+                    addLog(`${currentPlayer.name} bu kartı atladı.`);
                     break;
             }
             
+            // Ekip kontrolü
             if (currentPlayer.team <= 0) {
                 currentPlayer.eliminated = true;
                 currentPlayer.team = 0;
-                addLog(`${currentPlayer.name} elendi! ❌`, 'injury');
+                addLog(`${currentPlayer.name} ekibi kalmadı, oyundan elendi! ❌`, 'injury');
+            } else if (currentPlayer.team <= 2) {
+                addLog(`⚠️ ${currentPlayer.name}'in ekibi çok azaldı! (${currentPlayer.team} kişi)`, 'injury');
             }
             
             modal.classList.remove('show');
             displayPlayers();
-            setTimeout(() => nextPlayer(), 500);
+            
+            setTimeout(() => {
+                nextPlayer();
+            }, 500);
         }
 
         function nextPlayer() {
