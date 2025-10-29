@@ -48,7 +48,7 @@
 
         .game-area {
             display: grid;
-            grid-template-columns: 1fr 350px;
+            grid-template-columns: 810px 350px;
             gap: 30px;
             margin-bottom: 30px;
         }
@@ -60,11 +60,11 @@
         }
 
         .board {
-            width: 700px;
-            height: 700px;
+            width: 780px;
+            height: 780px;
             position: relative;
             background: #f8f9fa;
-            border: 4px solid #333;
+            border: 5px solid #333;
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
@@ -114,7 +114,7 @@
         .square.start {
             background: linear-gradient(135deg, #f8f9fa, #dee2e6);
             color: #333;
-            font-size: 0.8em;
+            font-size: 0.75em;
             font-weight: bold;
         }
 
@@ -333,7 +333,7 @@
 
         .card-type.enkaz { background: #c92a2a; }
         .card-type.saglik { background: #2f9e44; }
-        .card-type.lojistik { background: #fab005; }
+        .card-type.lojistik { background: #fab005; color: #333; }
         .card-type.iletisim { background: #1971c2; }
 
         .card-title {
@@ -400,7 +400,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 40px;
             font-size: 0.9em;
         }
 
@@ -429,23 +429,6 @@
         .turn-indicator {
             font-size: 1.2em;
             font-weight: bold;
-        }
-
-        @media (max-width: 1200px) {
-            .game-area {
-                grid-template-columns: 1fr;
-            }
-            
-            .board {
-                width: 600px;
-                height: 600px;
-            }
-            
-            .square {
-                width: 50px;
-                height: 50px;
-                font-size: 0.6em;
-            }
         }
     </style>
 </head>
@@ -519,6 +502,7 @@
     </div>
 
     <script>
+        // Oyun Durumu
         const gameState = {
             players: [
                 { id: 1, name: "Oyuncu 1", position: 0, team: 6, rescued: 0, eliminated: false, color: "p1", items: [] },
@@ -549,97 +533,28 @@
             'iletisim': 'İletişim'
         };
 
+        // Kart Desteleri (kısa versiyon - test için)
         const cardDecks = {
             enkaz: [
                 {
                     title: "Çökmüş Bina",
-                    scenario: "Büyük bir binanın altında 4 kişinin sıkıştığı görülüyor. Kurtarma sonrası ekip yorulacak.",
+                    scenario: "Büyük bir binanın altında 4 kişinin sıkıştığı görülüyor.",
                     choices: [
                         { text: "Kurtarmaya başla (Zar at: 4+ ise 4 kişi kurtar ama ekipten 1 kaybet, 3- ise 2 kişi kurtar ve ekipten 2 kaybet)", action: "diceCheck", threshold: 4, successRescue: 4, successTeamLoss: 1, failRescue: 2, failTeam: -2 }
                     ]
                 },
                 {
                     title: "Artçı Sarsıntı",
-                    scenario: "Enkaz bölgesindeyken artçı sarsıntı oldu! Zar at.",
+                    scenario: "Enkaz bölgesinde artçı sarsıntı!",
                     choices: [
                         { text: "Devam et (Zar at: 5+ ise 3 kişi kurtar, 4- ise ekipten 2 kaybet)", action: "diceCheck", threshold: 5, successRescue: 3, failTeam: -2 }
-                    ]
-                },
-                {
-                    title: "Kalın Beton Duvar",
-                    scenario: "Enkaz altında 3 kişi var ama kalın beton duvar var. Zorlu bir operasyon. (Hilti eşiği düşürür)",
-                    choices: [
-                        { text: "Duvarı kır (Zar at: 5+ ise 3 kurtar, ekipten 1 kaybet, 4- ise sadece ekipten 2 kaybet)", action: "diceCheck", threshold: 5, successRescue: 3, successTeamLoss: 1, failTeam: -2, canUseHilti: true }
-                    ]
-                },
-                {
-                    title: "Sesler Geliyor",
-                    scenario: "Enkazdan yardım çağrısı var. Hızlı hareket et!",
-                    choices: [
-                        { text: "Müdahale et (3 kişi kurtar, ekipten 1 yorgun düşer)", action: "rescue", rescue: 3, teamLoss: 1 }
-                    ]
-                },
-                {
-                    title: "Derin Enkaz",
-                    scenario: "Çok derin enkaz. 5 kişinin olduğu tahmin ediliyor. (Kurtarma köpeği avantaj sağlar)",
-                    choices: [
-                        { text: "Kurtarmayı dene (Zar at: 6 ise 5 kurtar ekipten 1 kaybet, 3-5 ise 2 kurtar ekipten 2 kaybet, 2- ise ekipten 3 kaybet)", action: "diceDeepRescue", canUseDog: true }
-                    ]
-                },
-                {
-                    title: "Göçük Riski",
-                    scenario: "Enkaz çok kararsız. Tehlikeli!",
-                    choices: [
-                        { text: "Kurtarmayı dene (Zar at: 4+ ise 3 kurtar ve ekipten 1 kaybet, 3- ise sadece ekipten 2 kaybet)", action: "diceCheck", threshold: 4, successRescue: 3, successTeamLoss: 1, failTeam: -2 }
-                    ]
-                },
-                {
-                    title: "Yaralı Vatandaş",
-                    scenario: "Enkaz altında ağır yaralı 2 kişi var. Dikkatli olmalısın. (İlk yardım çantası +1 kurtarma)",
-                    choices: [
-                        { text: "Kurtar (Zar at: 4+ ise 2 kurtar, 3- ise 1 kurtar, her durumda ekipten 1 kaybet)", action: "diceCheck", threshold: 4, successRescue: 2, failRescue: 1, alwaysTeamLoss: 1, canUseFirstAid: true }
-                    ]
-                },
-                {
-                    title: "Karanlık Bodrum",
-                    scenario: "Karanlık bodrum katında 3 kişi var. (Jeneratör çok yardımcı olur)",
-                    choices: [
-                        { text: "İlerle (Zar at: 5+ ise 3 kurtar ekipten 1 kaybet, 4- ise ekipten 2 kaybet)", action: "diceCheck", threshold: 5, successRescue: 3, successTeamLoss: 1, failTeam: -2, canUseGenerator: true }
-                    ]
-                },
-                {
-                    title: "Çocuk Sesleri",
-                    scenario: "Enkazdan çocuk sesleri geliyor!",
-                    choices: [
-                        { text: "Hemen kurtar (2 çocuk kurtar ama ekip çok yorulur, ekipten 2 kaybet)", action: "rescue", rescue: 2, teamLoss: 2 }
-                    ]
-                },
-                {
-                    title: "Gaz Kaçağı",
-                    scenario: "Enkaz altında gaz kaçağı var! Çok tehlikeli.",
-                    choices: [
-                        { text: "Müdahale et (Zar at: 5+ ise 2 kurtar ekipten 1 kaybet, 4- ise kurtarma yok ekipten 3 kaybet)", action: "diceCheck", threshold: 5, successRescue: 2, successTeamLoss: 1, failTeam: -3 }
-                    ]
-                },
-                {
-                    title: "Ezilme Sendromu",
-                    scenario: "Enkaz altında uzun süre kalmış 2 kişi var. Zor durum.",
-                    choices: [
-                        { text: "Acil kurtar (2 kişi kurtar ama ekipten 2 yorgun düşer)", action: "rescue", rescue: 2, teamLoss: 2 }
-                    ]
-                },
-                {
-                    title: "Ağır Enkaz",
-                    scenario: "Çok ağır bir beton blok altında 3 kişi sıkışmış.",
-                    choices: [
-                        { text: "Kaldırmayı dene (Zar at: 5+ ise 3 kurtar ekipten 1 kaybet, 4- ise 1 kurtar ekipten 2 kaybet)", action: "diceCheck", threshold: 5, successRescue: 3, successTeamLoss: 1, failRescue: 1, failTeam: -2 }
                     ]
                 }
             ],
             saglik: [
                 {
                     title: "Sağlık Çadırı",
-                    scenario: "Sağlık çadırına ulaştınız. Ekibiniz dinlenebilir.",
+                    scenario: "Sağlık çadırına ulaştınız.",
                     choices: [
                         { text: "Tam dinlenme (+2 ekip üyesi)", action: "teamGain", gain: 2 }
                     ]
@@ -648,175 +563,80 @@
                     title: "İlk Yardım Malzemesi",
                     scenario: "İlk yardım malzemesi var. Zar at!",
                     choices: [
-                        { text: "Zar at (4+ ise ilk yardım çantası kazan, 3- ise +1 ekip)", action: "diceItem", threshold: 4, item: "ilkYardim", failGain: 1 }
-                    ]
-                },
-                {
-                    title: "Ekipte Yaralanma",
-                    scenario: "Ekipten 1 kişi yaralandı ve tedavi için ayrılması gerekiyor.",
-                    choices: [
-                        { text: "Tedavi ettir (Ekipten 1 kaybet ama ilk yardım çantası kazan)", action: "tradeTeamForItem", teamLoss: 1, item: "ilkYardim" }
-                    ]
-                },
-                {
-                    title: "Tıbbi Malzeme Deposu",
-                    scenario: "Tıbbi malzeme deposuna ulaştınız.",
-                    choices: [
-                        { text: "Malzeme al (İlk yardım çantası kazan)", action: "getItem", item: "ilkYardim" }
-                    ]
-                },
-                {
-                    title: "Ekipte Hastalık",
-                    scenario: "Ekipten birisi hastalandı.",
-                    choices: [
-                        { text: "İstirahat ettir (Ekipten 1 kaybet)", action: "teamLoss", loss: 1 }
-                    ]
-                },
-                {
-                    title: "Psikolojik Yıpranma",
-                    scenario: "Ekip çok yorgun. Zar at!",
-                    choices: [
-                        { text: "Zar at (4+ ise +3 ekip, 3- ise +1 ekip)", action: "diceLuck", threshold: 4, successGain: 3, failGain: 1 }
-                    ]
-                },
-                {
-                    title: "Akraba Haberi",
-                    scenario: "Ekipten birisi ailesinden acil haber aldı ve gitmek istiyor.",
-                    choices: [
-                        { text: "İzin ver (Ekipten 1 kaybet)", action: "teamLoss", loss: 1 }
-                    ]
-                },
-                {
-                    title: "Ambulans Desteği",
-                    scenario: "Ambulans geldi. Destek alabilisiniz.",
-                    choices: [
-                        { text: "Ekibi muayene ettir (+2 ekip üyesi)", action: "teamGain", gain: 2 }
+                        { text: "Zar at (4+ ise ilk yardım çantası, 3- ise +1 ekip)", action: "diceItem", threshold: 4, item: "ilkYardim", failGain: 1 }
                     ]
                 }
             ],
             lojistik: [
                 {
                     title: "Ekipman Deposu",
-                    scenario: "Lojistik deposunda ekipman var. Zar at!",
+                    scenario: "Lojistik deposunda ekipman var.",
                     choices: [
-                        { text: "Zar at (5+ ise Hilti, 3-4 ise Jeneratör, 2- ise +1 ekip)", action: "diceMultiItem", highItem: "hilti", midItem: "jenerator", failGain: 1 }
+                        { text: "Zar at (5+ Hilti, 3-4 Jeneratör, 2- +1 ekip)", action: "diceMultiItem", highItem: "hilti", midItem: "jenerator", failGain: 1 }
                     ]
                 },
                 {
                     title: "Gönüllü Yardımı",
                     scenario: "Gönüllüler yardım etmek istiyor.",
                     choices: [
-                        { text: "Gönüllüleri kabul et (+3 ekip üyesi)", action: "teamGain", gain: 3 }
-                    ]
-                },
-                {
-                    title: "Araç Arızası",
-                    scenario: "Kurtarma aracınız arızalandı. Tamirci çağırmalısınız.",
-                    choices: [
-                        { text: "Tamir için bekle (Ekipten 1 kişi tamirde kalır)", action: "teamLoss", loss: 1 }
-                    ]
-                },
-                {
-                    title: "İtfaiye Desteği",
-                    scenario: "İtfaiye ekibi özel ekipman sunuyor.",
-                    choices: [
-                        { text: "Hilti al (Kesici alet)", action: "getItem", item: "hilti" }
-                    ]
-                },
-                {
-                    title: "Yakıt Sıkıntısı",
-                    scenario: "Yakıt azaldı. Ekipten biri yakıt getirmeye gidecek.",
-                    choices: [
-                        { text: "Yakıt getirt (Ekipten 1 kaybet ama Jeneratör kazan)", action: "tradeTeamForItem", teamLoss: 1, item: "jenerator" }
-                    ]
-                },
-                {
-                    title: "K9 Birimi",
-                    scenario: "Kurtarma köpeği birimi ile iletişime geçtiniz.",
-                    choices: [
-                        { text: "Kurtarma köpeği al", action: "getItem", item: "kurtarmaKopegi" }
-                    ]
-                },
-                {
-                    title: "Malzeme Eksikliği",
-                    scenario: "Önemli malzemeler eksik. Zar at!",
-                    choices: [
-                        { text: "Zar at (4+ ise Drone kazan, 3- ise +1 ekip)", action: "diceItem", threshold: 4, item: "drone", failGain: 1 }
-                    ]
-                },
-                {
-                    title: "Yol Kapanması",
-                    scenario: "Yol kapalı. Ekipten biri yol açmak için ayrılacak.",
-                    choices: [
-                        { text: "Yol aç (Ekipten 1 kaybet)", action: "teamLoss", loss: 1 }
+                        { text: "Kabul et (+3 ekip üyesi)", action: "teamGain", gain: 3 }
                     ]
                 }
             ],
             iletisim: [
                 {
                     title: "İletişim Merkezi",
-                    scenario: "Merkez ile bağlantı kurabilirsiniz. Zar at!",
+                    scenario: "Merkez ile bağlantı kurabilirsiniz.",
                     choices: [
-                        { text: "Zar at (5+ ise Telsiz kazan, 4- ise +2 ekip)", action: "diceItem", threshold: 5, item: "telsiz", failGain: 2 }
+                        { text: "Zar at (5+ Telsiz, 4- +2 ekip)", action: "diceItem", threshold: 5, item: "telsiz", failGain: 2 }
                     ]
                 },
                 {
                     title: "Acil Durum Hattı",
-                    scenario: "112 acil hattından destek alabilirsiniz.",
+                    scenario: "112'den destek alabilirsiniz.",
                     choices: [
-                        { text: "Ekip takviyesi iste (+3 ekip üyesi)", action: "teamGain", gain: 3 }
-                    ]
-                },
-                {
-                    title: "Telsiz Arızası",
-                    scenario: "Telsiziniz bozuldu. Tamire göndermelisiniz.",
-                    choices: [
-                        { text: "Tamire gönder (Ekipten 1 kaybet ama yeni Telsiz kazan)", action: "tradeTeamForItem", teamLoss: 1, item: "telsiz" }
-                    ]
-                },
-                {
-                    title: "Koordinasyon Toplantısı",
-                    scenario: "Koordinasyon toplantısı yapılıyor.",
-                    choices: [
-                        { text: "Toplantıya katıl (+2 ekip üyesi bilgi alır)", action: "teamGain", gain: 2 }
-                    ]
-                },
-                {
-                    title: "Yanlış Bilgi",
-                    scenario: "Yanlış konum bilgisi geldi. Ekip boşa yoruldu.",
-                    choices: [
-                        { text: "Geri dön (Ekipten 1 yorgun düşer)", action: "teamLoss", loss: 1 }
-                    ]
-                },
-                {
-                    title: "Helikopter Desteği",
-                    scenario: "Havadan destek alabilisiniz. Zar at!",
-                    choices: [
-                        { text: "Zar at (4+ ise Drone, 3- ise +1 ekip)", action: "diceItem", threshold: 4, item: "drone", failGain: 1 }
-                    ]
-                },
-                {
-                    title: "Acil Çağrı",
-                    scenario: "Başka bölgeden acil yardım istendi. Ekipten 2 kişi göndermelisiniz.",
-                    choices: [
-                        { text: "Yardım gönder (Ekipten 2 kaybet)", action: "teamLoss", loss: 2 }
-                    ]
-                },
-                {
-                    title: "Uydu Telefonu",
-                    scenario: "Uydu telefonu bulundu.",
-                    choices: [
-                        { text: "Al (Telsiz kazan)", action: "getItem", item: "telsiz" }
+                        { text: "Ekip takviyesi (+3 ekip üyesi)", action: "teamGain", gain: 3 }
                     ]
                 }
             ]
         };
 
+        // Oyun tahtasını oluştur - DOĞRU VERSİYON
         function createBoard() {
             const board = document.getElementById('board');
-            const size = 70;
-            const boardSize = 700;
-            const corners = [0, 11, 22, 33];
+            
+            // Doğru Düzen:
+            // START1 (sol üst) - 10 mekan (sağa doğru) - START2 (sağ üst)
+            // |                                                        |
+            // 10 mekan (aşağı)                              10 mekan (aşağı)
+            // |                                                        |
+            // START4 (sol alt) - 10 mekan (sağa doğru) - START3 (sağ alt)
+            
+            const layout = [
+                'start',                                                          // 0: START 1 (sol üst)
+                'enkaz', 'lojistik', 'saglik',                                   // 1-3
+                'enkaz', 'iletisim', 'saglik',                                   // 4-6
+                'lojistik', 'enkaz', 'iletisim',                                 // 7-9
+                'saglik',                                                         // 10
+                'start',                                                          // 11: START 2 (sağ üst)
+                'saglik', 'enkaz', 'iletisim',                                   // 12-14
+                'lojistik', 'enkaz', 'saglik',                                   // 15-17
+                'iletisim', 'lojistik', 'enkaz',                                 // 18-20
+                'iletisim',                                                       // 21
+                'start',                                                          // 22: START 3 (sağ alt)
+                'enkaz', 'saglik', 'lojistik',                                   // 23-25
+                'iletisim', 'enkaz', 'saglik',                                   // 26-28
+                'lojistik', 'iletisim', 'enkaz',                                 // 29-31
+                'saglik',                                                         // 32
+                'start',                                                          // 33: START 4 (sol alt)
+                'iletisim', 'enkaz', 'saglik',                                   // 34-36
+                'lojistik', 'iletisim', 'enkaz',                                 // 37-39
+                'saglik', 'lojistik', 'iletisim',                                // 40-42
+                'enkaz'                                                           // 43
+            ];
+            
+            const squareSize = 60;
+            const padding = 35;
             
             for (let i = 0; i < 44; i++) {
                 const square = document.createElement('div');
@@ -824,40 +644,47 @@
                 square.id = `square-${i}`;
                 
                 let x, y;
-                if (i <= 10) {
-                    x = i * 60 + 20;
-                    y = 20;
-                } else if (i <= 21) {
-                    x = boardSize - 80;
-                    y = (i - 11) * 60 + 20;
-                } else if (i <= 32) {
-                    x = boardSize - ((i - 22) * 60) - 80;
-                    y = boardSize - 80;
-                } else {
-                    x = 20;
-                    y = boardSize - ((i - 33) * 60) - 80;
+                
+                // ÜST SIRA: 0-11 (START1 solda, 10 mekan, START2 sağda)
+                if (i <= 11) {
+                    x = i * squareSize + padding;
+                    y = padding;
+                }
+                // SAĞ SIRA: 12-22 (START2 üstte, 10 mekan aşağı, START3 altta)
+                else if (i <= 22) {
+                    x = 11 * squareSize + padding;
+                    y = (i - 11) * squareSize + padding;
+                }
+                // ALT SIRA: 23-33 (START3 sağda, 10 mekan sola, START4 solda)
+                else if (i <= 33) {
+                    x = (33 - i) * squareSize + padding;
+                    y = 11 * squareSize + padding;
+                }
+                // SOL SIRA: 34-43 (START4'ten yukarı 10 mekan, START1'e döner)
+                else {
+                    x = padding;
+                    y = (44 - i) * squareSize + padding;
                 }
                 
                 square.style.left = x + 'px';
                 square.style.top = y + 'px';
                 
-                if (corners.includes(i)) {
+                const type = layout[i];
+                gameState.squares[i] = type;
+                
+                if (type === 'start') {
                     square.classList.add('start');
-                    square.innerHTML = `<span>BAŞLANGIÇ ${corners.indexOf(i) + 1}</span>`;
-                    gameState.squares[i] = 'start';
+                    const startNum = [0, 11, 22, 33].indexOf(i) + 1;
+                    square.innerHTML = `<span>START<br>${startNum}</span>`;
                 } else {
-                    const type = squareTypes[Math.floor(Math.random() * squareTypes.length)];
                     square.classList.add(type);
-                    square.innerHTML = `<span>${squareNames[type]}</span><span style="font-size:0.75em">#${i}</span>`;
-                    gameState.squares[i] = type;
+                    square.innerHTML = `<span style="font-size:0.65em;">${squareNames[type]}</span><span style="font-size:0.55em;">#${i}</span>`;
                 }
                 
                 board.appendChild(square);
             }
             
-            gameState.players.forEach(player => {
-                createPlayerPiece(player);
-            });
+            gameState.players.forEach(player => createPlayerPiece(player));
         }
 
         function createPlayerPiece(player) {
@@ -894,15 +721,10 @@
             gameState.players.forEach((player, index) => {
                 const card = document.createElement('div');
                 card.className = `player-card ${player.color}`;
-                if (index === gameState.currentPlayerIndex) {
-                    card.classList.add('active');
-                }
-                if (player.eliminated) {
-                    card.classList.add('eliminated');
-                }
+                if (index === gameState.currentPlayerIndex) card.classList.add('active');
+                if (player.eliminated) card.classList.add('eliminated');
                 
                 const totalScore = (player.rescued * 10) + (player.team * 2);
-                
                 const itemsHtml = player.items.length > 0 
                     ? `<div style="margin-top:8px;font-size:0.9em;">📦 ${player.items.map(i => items[i].icon).join(' ')}</div>`
                     : '';
@@ -910,41 +732,23 @@
                 card.innerHTML = `
                     <div class="player-name">${player.name} ${player.eliminated ? '❌' : ''}</div>
                     <div class="player-stats">
-                        <div class="stat">
-                            <div class="stat-label">Ekip</div>
-                            <div class="stat-value">${player.team}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Kurtarılan</div>
-                            <div class="stat-value">${player.rescued}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Pozisyon</div>
-                            <div class="stat-value">#${player.position}</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-label">Puan</div>
-                            <div class="stat-value">${totalScore}</div>
-                        </div>
+                        <div class="stat"><div class="stat-label">Ekip</div><div class="stat-value">${player.team}</div></div>
+                        <div class="stat"><div class="stat-label">Kurtarılan</div><div class="stat-value">${player.rescued}</div></div>
+                        <div class="stat"><div class="stat-label">Pozisyon</div><div class="stat-value">#${player.position}</div></div>
+                        <div class="stat"><div class="stat-label">Puan</div><div class="stat-value">${totalScore}</div></div>
                     </div>
                     ${itemsHtml}
                 `;
-                
                 container.appendChild(card);
             });
         }
 
         function rollDice() {
             const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-            
-            if (currentPlayer.eliminated) {
-                nextPlayer();
-                return;
-            }
+            if (currentPlayer.eliminated) { nextPlayer(); return; }
             
             const diceElement = document.getElementById('dice');
             const rollBtn = document.getElementById('rollDiceBtn');
-            
             rollBtn.disabled = true;
             diceElement.classList.add('rolling');
             
@@ -958,10 +762,7 @@
                     const result = Math.floor(Math.random() * 6) + 1;
                     diceElement.textContent = result;
                     diceElement.classList.remove('rolling');
-                    
-                    setTimeout(() => {
-                        movePlayer(result);
-                    }, 300);
+                    setTimeout(() => movePlayer(result), 300);
                 }
             }, 100);
         }
@@ -972,7 +773,7 @@
             currentPlayer.position = newPosition;
             
             updatePlayerPosition(currentPlayer);
-            addLog(`${currentPlayer.name} ${steps} adım ilerledi ve #${newPosition} karesine ulaştı.`);
+            addLog(`${currentPlayer.name} ${steps} adım ilerledi (#${newPosition})`);
             
             setTimeout(() => {
                 const squareType = gameState.squares[newPosition];
@@ -989,10 +790,8 @@
         function drawCard(type) {
             const currentPlayer = gameState.players[gameState.currentPlayerIndex];
             
-            // Ekip 3 ve altındaysa enkaz kartı çekemez
             if (type === 'enkaz' && currentPlayer.team < 3) {
-                addLog(`⚠️ ${currentPlayer.name}'in ekibi yetersiz (${currentPlayer.team} kişi)! Enkaz operasyonu yapılamadı.`, 'injury');
-                addLog(`${currentPlayer.name} bu turda hiçbir şey yapamadı.`, 'injury');
+                addLog(`⚠️ ${currentPlayer.name}'in ekibi yetersiz! Enkaz operasyonu yapılamadı.`, 'injury');
                 document.getElementById('rollDiceBtn').disabled = false;
                 nextPlayer();
                 return;
@@ -1000,40 +799,20 @@
             
             const deck = cardDecks[type];
             const card = deck[Math.floor(Math.random() * deck.length)];
-            
             displayCard(type, card);
         }
 
         function displayCard(type, card) {
             const modal = document.getElementById('cardModal');
-            const cardType = document.getElementById('cardType');
-            const cardTitle = document.getElementById('cardTitle');
-            const cardScenario = document.getElementById('cardScenario');
+            document.getElementById('cardType').textContent = squareNames[type].toUpperCase();
+            document.getElementById('cardType').className = `card-type ${type}`;
+            document.getElementById('cardTitle').textContent = card.title;
+            document.getElementById('cardScenario').textContent = card.scenario;
+            
             const cardChoices = document.getElementById('cardChoices');
-            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-            
-            cardType.textContent = squareNames[type].toUpperCase();
-            cardType.className = `card-type ${type}`;
-            cardTitle.textContent = card.title;
-            cardScenario.textContent = card.scenario;
-            
             cardChoices.innerHTML = '';
             
-            // Telsiz özelliği - en yakın enkaza ışınlan
-            if (currentPlayer.items.includes('telsiz')) {
-                const teleportBtn = document.createElement('button');
-                teleportBtn.className = 'choice-btn';
-                teleportBtn.style.background = '#1971c2';
-                teleportBtn.style.color = 'white';
-                teleportBtn.textContent = '📻 Telsiz Kullan: En yakın enkaz alanına git';
-                teleportBtn.onclick = () => {
-                    modal.classList.remove('show');
-                    teleportToNearestEnkaz();
-                };
-                cardChoices.appendChild(teleportBtn);
-            }
-            
-            card.choices.forEach((choice, index) => {
+            card.choices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.textContent = choice.text;
@@ -1043,72 +822,39 @@
             
             modal.classList.add('show');
         }
-        
-        function teleportToNearestEnkaz() {
-            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-            const currentPos = currentPlayer.position;
-            
-            // En yakın enkaz alanını bul
-            let nearestEnkaz = -1;
-            let minDistance = 999;
-            
-            for (let i = 0; i < 44; i++) {
-                if (gameState.squares[i] === 'enkaz') {
-                    let distance = Math.abs(i - currentPos);
-                    if (distance > 22) distance = 44 - distance; // Döngüsel mesafe
-                    
-                    if (distance < minDistance && distance > 0) {
-                        minDistance = distance;
-                        nearestEnkaz = i;
-                    }
-                }
-            }
-            
-            if (nearestEnkaz !== -1) {
-                currentPlayer.items = currentPlayer.items.filter(i => i !== 'telsiz');
-                currentPlayer.position = nearestEnkaz;
-                updatePlayerPosition(currentPlayer);
-                addLog(`${currentPlayer.name} telsiz kullanarak #${nearestEnkaz} enkaz alanına gitti! 📻`, 'resource');
-                
-                setTimeout(() => {
-                    drawCard('enkaz');
-                }, 600);
-            } else {
-                addLog(`Yakında enkaz alanı yok!`, 'injury');
-                nextPlayer();
-            }
-        }
 
         function handleChoice(choice) {
             const currentPlayer = gameState.players[gameState.currentPlayerIndex];
             const modal = document.getElementById('cardModal');
             
             switch(choice.action) {
-                case 'getItem':
-                    if (!currentPlayer.items.includes(choice.item)) {
-                        currentPlayer.items.push(choice.item);
-                        const itemData = items[choice.item];
-                        addLog(`${currentPlayer.name} ${itemData.icon} ${itemData.name} kazandı!`, 'resource');
-                    } else {
-                        addLog(`${currentPlayer.name} zaten ${items[choice.item].name} var, +1 ekip kazandı.`, 'resource');
-                        currentPlayer.team += 1;
-                    }
-                    break;
-                
-                case 'teamLoss':
-                    currentPlayer.team -= choice.loss;
-                    addLog(`${currentPlayer.name} ekipten ${choice.loss} üye kaybetti.`, 'injury');
+                case 'teamGain':
+                    currentPlayer.team += choice.gain;
+                    addLog(`${currentPlayer.name} +${choice.gain} ekip kazandı!`, 'resource');
                     break;
                     
-                case 'tradeTeamForItem':
-                    currentPlayer.team -= choice.teamLoss;
-                    if (!currentPlayer.items.includes(choice.item)) {
-                        currentPlayer.items.push(choice.item);
-                        const itemData = items[choice.item];
-                        addLog(`${currentPlayer.name} ekipten ${choice.teamLoss} vererek ${itemData.icon} ${itemData.name} kazandı!`, 'resource');
+                case 'diceCheck':
+                    const dice = Math.floor(Math.random() * 6) + 1;
+                    addLog(`${currentPlayer.name} zar attı: ${dice}`);
+                    
+                    if (dice >= choice.threshold) {
+                        if (choice.successRescue) {
+                            currentPlayer.rescued += choice.successRescue;
+                            addLog(`Başarılı! ${choice.successRescue} kişi kurtarıldı!`, 'rescue');
+                        }
+                        if (choice.successTeamLoss) {
+                            currentPlayer.team -= choice.successTeamLoss;
+                            addLog(`Ekipten ${choice.successTeamLoss} kayıp.`, 'injury');
+                        }
                     } else {
-                        currentPlayer.team += 1;
-                        addLog(`${currentPlayer.name} zaten item var, ekipten ${choice.teamLoss} kayıp oldu ama +1 ekip bonusu.`, 'resource');
+                        if (choice.failRescue) {
+                            currentPlayer.rescued += choice.failRescue;
+                            addLog(`${choice.failRescue} kişi kurtarıldı.`, 'rescue');
+                        }
+                        if (choice.failTeam) {
+                            currentPlayer.team += choice.failTeam;
+                            addLog(`Ekipten ${Math.abs(choice.failTeam)} kayıp!`, 'injury');
+                        }
                     }
                     break;
                     
@@ -1119,15 +865,14 @@
                     if (itemDice >= choice.threshold) {
                         if (!currentPlayer.items.includes(choice.item)) {
                             currentPlayer.items.push(choice.item);
-                            const itemData = items[choice.item];
-                            addLog(`Başarılı! ${itemData.icon} ${itemData.name} kazandı!`, 'resource');
+                            addLog(`${items[choice.item].icon} ${items[choice.item].name} kazandı!`, 'resource');
                         } else {
                             currentPlayer.team += 2;
-                            addLog(`Zaten item var, +2 ekip kazandı!`, 'resource');
+                            addLog(`+2 ekip kazandı!`, 'resource');
                         }
                     } else {
                         currentPlayer.team += choice.failGain;
-                        addLog(`+${choice.failGain} ekip üyesi kazandı.`, 'resource');
+                        addLog(`+${choice.failGain} ekip kazandı.`, 'resource');
                     }
                     break;
                     
@@ -1138,10 +883,10 @@
                     if (multiDice >= 5) {
                         if (!currentPlayer.items.includes(choice.highItem)) {
                             currentPlayer.items.push(choice.highItem);
-                            addLog(`Harika! ${items[choice.highItem].icon} ${items[choice.highItem].name} kazandı!`, 'resource');
+                            addLog(`${items[choice.highItem].icon} ${items[choice.highItem].name} kazandı!`, 'resource');
                         } else {
                             currentPlayer.team += 2;
-                            addLog(`Zaten var, +2 ekip kazandı!`, 'resource');
+                            addLog(`+2 ekip!`, 'resource');
                         }
                     } else if (multiDice >= 3) {
                         if (!currentPlayer.items.includes(choice.midItem)) {
@@ -1149,145 +894,24 @@
                             addLog(`${items[choice.midItem].icon} ${items[choice.midItem].name} kazandı!`, 'resource');
                         } else {
                             currentPlayer.team += 1;
-                            addLog(`Zaten var, +1 ekip kazandı!`, 'resource');
+                            addLog(`+1 ekip!`, 'resource');
                         }
                     } else {
                         currentPlayer.team += choice.failGain;
-                        addLog(`+${choice.failGain} ekip üyesi kazandı.`, 'resource');
+                        addLog(`+${choice.failGain} ekip.`, 'resource');
                     }
-                    break;
-                    
-                case 'diceLuck':
-                    const luckDice = Math.floor(Math.random() * 6) + 1;
-                    addLog(`${currentPlayer.name} zar attı: ${luckDice}`);
-                    
-                    if (luckDice >= choice.threshold) {
-                        currentPlayer.team += choice.successGain;
-                        addLog(`Şanslı! +${choice.successGain} ekip kazandı!`, 'resource');
-                    } else {
-                        currentPlayer.team += choice.failGain;
-                        addLog(`+${choice.failGain} ekip kazandı.`, 'resource');
-                    }
-                    break;
-                
-                case 'rescue':
-                    let rescueAmount = choice.rescue;
-                    
-                    // İlk yardım çantası ile yaralı kurtarma bonusu
-                    if (choice.canUseFirstAid && currentPlayer.items.includes('ilkYardim')) {
-                        rescueAmount += 1;
-                        addLog(`${currentPlayer.name} ilk yardım çantası kullandı! +1 bonus`, 'resource');
-                    }
-                    
-                    currentPlayer.rescued += rescueAmount;
-                    addLog(`${currentPlayer.name} ${rescueAmount} kişi kurtardı! 🎉`, 'rescue');
-                    
-                    if (choice.teamLoss) {
-                        currentPlayer.team -= choice.teamLoss;
-                        addLog(`Ekip yoruldu, ${choice.teamLoss} üye kaybedildi.`, 'injury');
-                    }
-                    break;
-                    
-                case 'diceCheck':
-                    const diceResult = Math.floor(Math.random() * 6) + 1;
-                    let finalThreshold = choice.threshold;
-                    
-                    // Hilti ile beton duvar bonusu
-                    if (choice.canUseHilti && currentPlayer.items.includes('hilti')) {
-                        finalThreshold -= 2;
-                        addLog(`${currentPlayer.name} Hilti kullandı! Zar eşiği -2`, 'resource');
-                    }
-                    
-                    // Kurtarma köpeği ile derin enkaz bonusu
-                    if (choice.canUseDog && currentPlayer.items.includes('kurtarmaKopegi')) {
-                        finalThreshold -= 1;
-                        addLog(`${currentPlayer.name} kurtarma köpeği kullandı! Zar eşiği -1`, 'resource');
-                    }
-                    
-                    // Jeneratör ile karanlık bonus
-                    if (choice.canUseGenerator && currentPlayer.items.includes('jenerator')) {
-                        finalThreshold -= 2;
-                        addLog(`${currentPlayer.name} jeneratör kullandı! Zar eşiği -2`, 'resource');
-                    }
-                    
-                    addLog(`${currentPlayer.name} zar attı: ${diceResult} (Eşik: ${finalThreshold})`);
-                    
-                    if (diceResult >= finalThreshold) {
-                        if (choice.successRescue) {
-                            currentPlayer.rescued += choice.successRescue;
-                            addLog(`Başarılı! ${choice.successRescue} kişi kurtarıldı! 🎉`, 'rescue');
-                        }
-                        if (choice.successTeamLoss) {
-                            currentPlayer.team -= choice.successTeamLoss;
-                            addLog(`Ekip yoruldu, ${choice.successTeamLoss} üye kaybedildi.`, 'injury');
-                        }
-                    } else {
-                        if (choice.failRescue) {
-                            currentPlayer.rescued += choice.failRescue;
-                            addLog(`${choice.failRescue} kişi kurtarıldı.`, 'rescue');
-                        }
-                        if (choice.failTeam) {
-                            currentPlayer.team += choice.failTeam;
-                            addLog(`Ekipten ${Math.abs(choice.failTeam)} üye kaybedildi.`, 'injury');
-                        }
-                    }
-                    
-                    if (choice.alwaysTeamLoss) {
-                        currentPlayer.team -= choice.alwaysTeamLoss;
-                        addLog(`Zorlu operasyon, ekipten ${choice.alwaysTeamLoss} üye kaybedildi.`, 'injury');
-                    }
-                    break;
-                    
-                case 'diceDeepRescue':
-                    const deepDice = Math.floor(Math.random() * 6) + 1;
-                    let deepThreshold = 6;
-                    
-                    if (choice.canUseDog && currentPlayer.items.includes('kurtarmaKopegi')) {
-                        deepThreshold = 5;
-                        addLog(`${currentPlayer.name} kurtarma köpeği kullandı!`, 'resource');
-                    }
-                    
-                    addLog(`${currentPlayer.name} zar attı: ${deepDice}`);
-                    
-                    if (deepDice >= deepThreshold) {
-                        currentPlayer.rescued += 5;
-                        currentPlayer.team -= 1;
-                        addLog(`Mükemmel! 5 kişi kurtarıldı! Ekipten 1 yoruldu.`, 'rescue');
-                    } else if (deepDice >= 3) {
-                        currentPlayer.rescued += 2;
-                        currentPlayer.team -= 2;
-                        addLog(`2 kişi kurtarıldı ama ekipten 2 kayıp.`, 'rescue');
-                    } else {
-                        currentPlayer.team -= 3;
-                        addLog(`Kurtarma başarısız! Ekipten 3 üye kaybedildi!`, 'injury');
-                    }
-                    break;
-                    
-                case 'teamGain':
-                    currentPlayer.team += choice.gain;
-                    addLog(`${currentPlayer.name} ekibine +${choice.gain} üye ekledi!`, 'resource');
-                    break;
-                    
-                case 'skip':
-                    addLog(`${currentPlayer.name} bu kartı atladı.`);
                     break;
             }
             
-            // Ekip kontrolü
             if (currentPlayer.team <= 0) {
                 currentPlayer.eliminated = true;
                 currentPlayer.team = 0;
-                addLog(`${currentPlayer.name} ekibi kalmadı, oyundan elendi! ❌`, 'injury');
-            } else if (currentPlayer.team <= 2) {
-                addLog(`⚠️ ${currentPlayer.name}'in ekibi çok azaldı! (${currentPlayer.team} kişi)`, 'injury');
+                addLog(`${currentPlayer.name} elendi! ❌`, 'injury');
             }
             
             modal.classList.remove('show');
             displayPlayers();
-            
-            setTimeout(() => {
-                nextPlayer();
-            }, 500);
+            setTimeout(() => nextPlayer(), 500);
         }
 
         function nextPlayer() {
@@ -1298,12 +922,7 @@
             } while (gameState.players[gameState.currentPlayerIndex].eliminated && attempts < gameState.players.length);
             
             const activePlayers = gameState.players.filter(p => !p.eliminated);
-            if (activePlayers.length === 0) {
-                endGame();
-                return;
-            }
-            
-            if (activePlayers.length === 1) {
+            if (activePlayers.length <= 1) {
                 endGame();
                 return;
             }
